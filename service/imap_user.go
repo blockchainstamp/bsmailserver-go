@@ -39,7 +39,6 @@ func (user *ImapUser) DeleteMailbox(name string) error {
 }
 
 func (user *ImapUser) RenameMailbox(existingName, newName string) error {
-
 	_imapLog.Debugf("[%s] RenameMailbox", user.username)
 	return nil
 }

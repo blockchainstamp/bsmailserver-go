@@ -28,7 +28,7 @@ func init() {
 }
 
 func initSystemDefault(cmd *cobra.Command, args []string) {
-	dc := cfg.SrvStaticConfig{
+	dc := cfg.SysStaticConfig{
 		SmtpCfg:     "smtp.json",
 		ImapCfg:     "imap.json",
 		BSCfg:       "stamp.json",
@@ -86,6 +86,14 @@ func initSystemDefault(cmd *cobra.Command, args []string) {
 		WalletPwd: "123",
 	}
 	if err := util.WriteJsonFile(subPath, bsConf); err != nil {
+		panic(err)
+	}
+
+	subPath = path.Join(confPath, string(filepath.Separator), dc.BackendCfg)
+	backendCfg := cfg.BackConfig{
+		UseMemDB: true,
+	}
+	if err := util.WriteJsonFile(subPath, backendCfg); err != nil {
 		panic(err)
 	}
 

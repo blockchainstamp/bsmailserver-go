@@ -1,4 +1,4 @@
-package memory
+package protocol
 
 import (
 	"github.com/emersion/go-imap/backend"
@@ -7,7 +7,8 @@ import (
 type ImapUser struct {
 	username  string
 	password  string
-	mailboxes map[string]*ImapMailBox
+	mailboxes MailBoxGroup
+	dbExe     DatabaseExe
 }
 
 func (user *ImapUser) Username() string {
@@ -15,7 +16,7 @@ func (user *ImapUser) Username() string {
 }
 
 func (user *ImapUser) ListMailboxes(subscribed bool) ([]backend.Mailbox, error) {
-	_memBackLog.Debugf("[%s] ListMailboxes[%t]", user.username, subscribed)
+	_protLog.Debugf("[%s] ListMailboxes[%t]", user.username, subscribed)
 	var boxes []backend.Mailbox
 	for _, box := range user.mailboxes {
 		boxes = append(boxes, box)
@@ -24,26 +25,27 @@ func (user *ImapUser) ListMailboxes(subscribed bool) ([]backend.Mailbox, error) 
 }
 
 func (user *ImapUser) GetMailbox(name string) (backend.Mailbox, error) {
-	_memBackLog.Debugf("[%s] GetMailbox[%s]", user.username, name)
+	_protLog.Debugf("[%s] GetMailbox[%s]", user.username, name)
 	return user.mailboxes[name], nil
 }
 
 func (user *ImapUser) CreateMailbox(name string) error {
-	_memBackLog.Debugf("[%s] CreateMailbox", user.username)
+	_protLog.Debugf("[%s] CreateMailbox", user.username)
 	return nil
 }
 
 func (user *ImapUser) DeleteMailbox(name string) error {
-	_memBackLog.Debugf("[%s] DeleteMailbox", user.username)
+	_protLog.Debugf("[%s] DeleteMailbox", user.username)
 	return nil
 }
 
 func (user *ImapUser) RenameMailbox(existingName, newName string) error {
-	_memBackLog.Debugf("[%s] RenameMailbox", user.username)
+	_protLog.Debugf("[%s] RenameMailbox", user.username)
 	return nil
 }
 
 func (user *ImapUser) Logout() error {
-	_memBackLog.Debugf("[%s] Logout", user.username)
+	_protLog.Debugf("[%s] Logout", user.username)
+	user.dbExe.Logout(user)
 	return nil
 }

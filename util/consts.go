@@ -1,5 +1,7 @@
 package util
 
+import "fmt"
+
 const (
 	DefaultBaseDir    = "MailBase"
 	DefaultSysConfig  = "bsmail.conf"
@@ -18,4 +20,9 @@ const (
 	DBJsonHome   = "jsonDB"
 	DBLevelHome  = "levelDB"
 	DBSqliteHome = "sqliteDB"
+)
+
+var (
+	ImapNoSuchUser = fmt.Errorf("no such user")
+	ImapBadUser    = fmt.Errorf("bad user name and password")
 )

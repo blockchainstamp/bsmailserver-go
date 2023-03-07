@@ -2,9 +2,8 @@ package service
 
 import (
 	"fmt"
+	"github.com/blockchainstamp/bsmailserver-go/backstore"
 	"github.com/blockchainstamp/bsmailserver-go/cfg"
-	"github.com/emersion/go-imap"
-	"github.com/emersion/go-imap/backend"
 	iSrv "github.com/emersion/go-imap/server"
 )
 
@@ -12,17 +11,10 @@ type ImapSrv struct {
 	imapSrv *iSrv.Server
 }
 
-func (is *ImapSrv) Login(connInfo *imap.ConnInfo, username, password string) (backend.User, error) {
-
-	u := &ImapUser{username: username, password: password}
-	_imapLog.Infof("user[%s] login success", username)
-	return u, nil
-}
-
 func newImapSrv() *ImapSrv {
 	var is = &ImapSrv{}
 	var conf = cfg.CurImapConf()
-	imapSrv := iSrv.New(is)
+	imapSrv := iSrv.New(backstore.Inst())
 	imapSrv.Addr = fmt.Sprintf("%s:%d", conf.SrvAddr, conf.SrvPort)
 	imapSrv.AllowInsecureAuth = conf.TlsCfg == nil
 	imapSrv.TLSConfig = conf.TlsCfg

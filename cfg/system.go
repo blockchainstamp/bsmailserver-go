@@ -18,7 +18,6 @@ type SysStaticConfig struct {
 	BackendCfg  string `json:"backend_cfg"`
 	WalletInUse string `json:"wallet_in_use"`
 	LogLevel    string `json:"log_level"`
-	DBHome      string `json:"db_home"`
 	CmdSrvAddr  string `json:"cmd_srv_addr"`
 }
 
@@ -77,9 +76,10 @@ func PrepareConfig(homeDir string) error {
 	}
 
 	_curSysConf = &SysRunTimeConfig{
-		smtp:   sc,
-		imap:   ic,
-		bStamp: bc,
+		smtp:    sc,
+		imap:    ic,
+		bStamp:  bc,
+		backend: backCfg,
 	}
 	return nil
 }
@@ -118,7 +118,7 @@ func CurBStampConf() *BStampConf {
 
 func CurBackendConf() *BackConfig {
 	if _curSysConf.backend == nil {
-		panic("init stamp config first please!!!")
+		panic("init backend storage config first please!!!")
 	}
 	return _curSysConf.backend
 }

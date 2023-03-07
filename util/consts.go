@@ -13,4 +13,9 @@ const (
 	SMTPReadTimeOut   = 10
 	SMTPWriteTimeOut  = 10
 	SMTPMaxRecipients = 1 << 10
+
+	DBMemHome    = "memDB"
+	DBJsonHome   = "jsonDB"
+	DBLevelHome  = "levelDB"
+	DBSqliteHome = "sqliteDB"
 )

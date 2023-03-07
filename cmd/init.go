@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/blockchainstamp/bsmailserver-go/backstore"
 	"github.com/blockchainstamp/bsmailserver-go/cfg"
 	"github.com/blockchainstamp/bsmailserver-go/util"
 	"github.com/spf13/cobra"
@@ -34,7 +35,6 @@ func initSystemDefault(cmd *cobra.Command, args []string) {
 		BSCfg:       "config/stamp.json",
 		BackendCfg:  "config/backend.json",
 		WalletInUse: "wallets/main.json",
-		DBHome:      "mail_data",
 		LogLevel:    "info",
 		CmdSrvAddr:  util.DefaultCmdSrvAddr,
 	}
@@ -53,12 +53,12 @@ func initSystemDefault(cmd *cobra.Command, args []string) {
 		panic(err)
 	}
 
-	subPath := path.Join(baseDir, string(filepath.Separator), dc.SmtpCfg)
+	smtpCfgFilePath := path.Join(baseDir, string(filepath.Separator), dc.SmtpCfg)
 	sConf := cfg.SMTPCfg{
 		SrvAddr:         "0.0.0.0",
-		SrvDomain:       "smtp.simplenets.org",
-		TlsKey:          "/etc/letsencrypt/live/smtp.simplenets.org/privkey.pem",
-		TlsCert:         "/etc/letsencrypt/live/smtp.simplenets.org/fullchain.pem",
+		SrvDomain:       "localhost", //smtp.simplenets.org
+		TlsKey:          "config/key.pem",
+		TlsCert:         "config/cert.pem",
 		DKIMKey:         "config/dkim.key",
 		SrvPort:         util.DefaultSMTPPort,
 		MaxMessageBytes: util.MaxMailSize,
@@ -67,37 +67,39 @@ func initSystemDefault(cmd *cobra.Command, args []string) {
 		MaxRecipients:   util.SMTPMaxRecipients,
 	}
 
-	if err := util.WriteJsonFile(subPath, sConf); err != nil {
+	if err := util.WriteJsonFile(smtpCfgFilePath, sConf); err != nil {
 		panic(err)
 	}
 
-	subPath = path.Join(baseDir, string(filepath.Separator), dc.ImapCfg)
+	imapCfgFilePath := path.Join(baseDir, string(filepath.Separator), dc.ImapCfg)
 	iConf := cfg.IMAPCfg{
-		TlsKey:  "/etc/letsencrypt/live/smtp.simplenets.org/privkey.pem",
-		TlsCert: "/etc/letsencrypt/live/smtp.simplenets.org/fullchain.pem",
+		TlsKey:  "config/key.pem",
+		TlsCert: "config/cert.pem",
 		SrvPort: util.DefaultIMAPPort,
 		SrvAddr: "0.0.0.0",
 	}
-	if err := util.WriteJsonFile(subPath, iConf); err != nil {
+	if err := util.WriteJsonFile(imapCfgFilePath, iConf); err != nil {
 		panic(err)
 	}
 
-	subPath = path.Join(baseDir, string(filepath.Separator), dc.BSCfg)
+	bsCfgFilePath := path.Join(baseDir, string(filepath.Separator), dc.BSCfg)
 	bsConf := cfg.BStampConf{
 		WalletPwd: "123",
 	}
-	if err := util.WriteJsonFile(subPath, bsConf); err != nil {
+	if err := util.WriteJsonFile(bsCfgFilePath, bsConf); err != nil {
 		panic(err)
 	}
 
-	subPath = path.Join(baseDir, string(filepath.Separator), dc.BackendCfg)
-	backendCfg := cfg.BackConfig{}
-	if err := util.WriteJsonFile(subPath, backendCfg); err != nil {
-		panic(subPath)
+	backendCfg := cfg.BackConfig{
+		DBType: cfg.DBTypMem,
+		DBHome: "mail_data",
 	}
-
-	subPath = path.Join(baseDir, string(filepath.Separator), dc.DBHome)
-	if err := util.TouchDir(subPath); err != nil {
+	backedCfgFilePath := path.Join(baseDir, string(filepath.Separator), dc.BackendCfg)
+	if err := util.WriteJsonFile(backedCfgFilePath, backendCfg); err != nil {
+		panic(err)
+	}
+	dbHome := path.Join(baseDir, string(filepath.Separator), backendCfg.DBHome)
+	if err := backstore.InitDefaultDB(dbHome); err != nil {
 		panic(err)
 	}
 
@@ -106,8 +108,8 @@ func initSystemDefault(cmd *cobra.Command, args []string) {
 		panic(err)
 	}
 
-	subPath = path.Join(baseDir, string(filepath.Separator), util.DefaultSysConfig)
-	if err := util.WriteJsonFile(subPath, dc); err != nil {
+	sysCfgFilePath := path.Join(baseDir, string(filepath.Separator), util.DefaultSysConfig)
+	if err := util.WriteJsonFile(sysCfgFilePath, dc); err != nil {
 		panic(err)
 	}
 }

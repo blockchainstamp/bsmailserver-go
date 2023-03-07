@@ -8,6 +8,7 @@ import (
 	"github.com/blockchainstamp/bsmailserver-go/cfg"
 	"github.com/blockchainstamp/bsmailserver-go/util"
 	"github.com/emersion/go-imap/backend"
+	"github.com/emersion/go-smtp"
 	"github.com/sirupsen/logrus"
 	"path"
 	"path/filepath"
@@ -24,6 +25,7 @@ var (
 
 type StoreBackend interface {
 	backend.Backend
+	smtp.Backend
 }
 
 func Inst() StoreBackend {

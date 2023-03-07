@@ -2,54 +2,21 @@ package service
 
 import (
 	"fmt"
+	"github.com/blockchainstamp/bsmailserver-go/backstore"
 	"github.com/blockchainstamp/bsmailserver-go/cfg"
 	"github.com/emersion/go-smtp"
-	"io"
 	"time"
 )
 
-func (ss *SmtpSrv) NewSession(c *smtp.Conn) (smtp.Session, error) {
-	return ss, nil
-}
-
 type SmtpSrv struct {
 	service *smtp.Server
-}
-
-func (ss *SmtpSrv) Reset() {
-	_smtpLog.Debug("smtp reset")
-}
-
-func (ss *SmtpSrv) Logout() error {
-	_smtpLog.Debug("smtp Logout")
-	return nil
-}
-
-func (ss *SmtpSrv) AuthPlain(username, password string) error {
-	_smtpLog.Debug("smtp AuthPlain", username)
-	return nil
-}
-
-func (ss *SmtpSrv) Mail(from string, opts *smtp.MailOptions) error {
-	_smtpLog.Debug("smtp Mail", from)
-	return nil
-}
-
-func (ss *SmtpSrv) Rcpt(to string) error {
-	_smtpLog.Debug("smtp Rcpt", to)
-	return nil
-}
-
-func (ss *SmtpSrv) Data(r io.Reader) error {
-	_smtpLog.Debug("smtp Data")
-	return nil
 }
 
 func newSmtpSrv() *SmtpSrv {
 
 	var ss = &SmtpSrv{}
 	var conf = cfg.CurSmtpConf()
-	var smtpSrv = smtp.NewServer(ss)
+	var smtpSrv = smtp.NewServer(backstore.Inst())
 
 	smtpSrv.Addr = fmt.Sprintf("%s:%d", conf.SrvAddr, conf.SrvPort)
 	smtpSrv.Domain = conf.SrvDomain

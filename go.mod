@@ -5,6 +5,7 @@ go 1.20
 require (
 	github.com/blockchainstamp/go-mail-proxy v1.2.2
 	github.com/emersion/go-imap v1.2.1
+	github.com/emersion/go-message v0.15.0
 	github.com/emersion/go-smtp v0.16.0
 	github.com/sirupsen/logrus v1.9.0
 	github.com/spf13/cobra v1.6.1
@@ -22,6 +23,7 @@ require (
 	github.com/decred/dcrd/dcrec/secp256k1/v4 v4.1.0 // indirect
 	github.com/emersion/go-imap-id v0.0.0-20190926060100-f94a56b9ecde // indirect
 	github.com/emersion/go-sasl v0.0.0-20220912192320-0145f2c60ead // indirect
+	github.com/emersion/go-textwrapper v0.0.0-20200911093747-65d896831594 // indirect
 	github.com/ethereum/go-ethereum v1.10.26 // indirect
 	github.com/go-ole/go-ole v1.2.1 // indirect
 	github.com/go-stack/stack v1.8.0 // indirect

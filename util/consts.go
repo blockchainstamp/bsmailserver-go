@@ -23,6 +23,9 @@ const (
 )
 
 var (
-	ImapNoSuchUser = fmt.Errorf("no such user")
-	ImapBadUser    = fmt.Errorf("bad user name and password")
+	BackendNoSuchUser       = fmt.Errorf("no such user")
+	BackendBadUser          = fmt.Errorf("bad user name and password")
+	BackendNoSuchMailBox    = fmt.Errorf("no such mail box")
+	BackendDuplicateMailBox = fmt.Errorf("duplicated mail box")
+	BackendDeleteInbox      = fmt.Errorf("inbox can't be removed")
 )

@@ -18,7 +18,7 @@ type SysStaticConfig struct {
 	BackendCfg  string `json:"backend_cfg"`
 	WalletInUse string `json:"wallet_in_use"`
 	LogLevel    string `json:"log_level"`
-	DBPath      string `json:"db_path"`
+	DBHome      string `json:"db_home"`
 	CmdSrvAddr  string `json:"cmd_srv_addr"`
 }
 

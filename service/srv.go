@@ -45,6 +45,6 @@ func newSimpleMail() Service {
 
 func bsMailSrv() Service {
 	fmt.Println("using block chain stamp......")
-	bsm := &StampMailSrv{}
+	bsm := &BlockchainMailSrv{}
 	return bsm
 }

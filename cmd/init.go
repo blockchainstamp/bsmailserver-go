@@ -34,7 +34,7 @@ func initSystemDefault(cmd *cobra.Command, args []string) {
 		BSCfg:       "config/stamp.json",
 		BackendCfg:  "config/backend.json",
 		WalletInUse: "wallets/main.json",
-		DBPath:      "mail_data",
+		DBHome:      "mail_data",
 		LogLevel:    "info",
 		CmdSrvAddr:  util.DefaultCmdSrvAddr,
 	}
@@ -59,7 +59,7 @@ func initSystemDefault(cmd *cobra.Command, args []string) {
 		SrvDomain:       "smtp.simplenets.org",
 		TlsKey:          "/etc/letsencrypt/live/smtp.simplenets.org/privkey.pem",
 		TlsCert:         "/etc/letsencrypt/live/smtp.simplenets.org/fullchain.pem",
-		DKIMKey:         "dkim.key",
+		DKIMKey:         "config/dkim.key",
 		SrvPort:         util.DefaultSMTPPort,
 		MaxMessageBytes: util.MaxMailSize,
 		ReadTimeOut:     util.SMTPReadTimeOut,
@@ -91,14 +91,12 @@ func initSystemDefault(cmd *cobra.Command, args []string) {
 	}
 
 	subPath = path.Join(baseDir, string(filepath.Separator), dc.BackendCfg)
-	backendCfg := cfg.BackConfig{
-		UseMemDB: true,
-	}
+	backendCfg := cfg.BackConfig{}
 	if err := util.WriteJsonFile(subPath, backendCfg); err != nil {
 		panic(subPath)
 	}
 
-	subPath = path.Join(baseDir, string(filepath.Separator), dc.DBPath)
+	subPath = path.Join(baseDir, string(filepath.Separator), dc.DBHome)
 	if err := util.TouchDir(subPath); err != nil {
 		panic(err)
 	}

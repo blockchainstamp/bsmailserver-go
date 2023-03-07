@@ -20,9 +20,14 @@ type StoreBackend interface {
 func Inst() StoreBackend {
 	conf := cfg.CurBackendConf()
 	_once.Do(func() {
-		if conf.UseMemDB {
+		switch conf.DBType {
+		case cfg.DBTypMem:
 			_inst = newMemDB()
-		} else {
+		case cfg.DBTypJson:
+			_inst = newJsonDB()
+		case cfg.DBTypLevelDB:
+			_inst = newLevelDB()
+		case cfg.DBTypSqlite:
 			_inst = newSqliteDB()
 		}
 	})

@@ -30,23 +30,20 @@ type SysRunTimeConfig struct {
 	backend  *BackConfig
 }
 
-func PrepareConfig(dir string) error {
+func PrepareConfig(homeDir string) error {
 	var (
 		err         error
-		sysConfPath = ""
-		confPath    = ""
 		sc          = &SMTPCfg{}
 		ic          = &IMAPCfg{}
 		bc          = &BStampConf{}
 		backCfg     = &BackConfig{}
+		sysConfPath = ""
 	)
 
-	if dir == "" {
-		sysConfPath = filepath.Join(util.DefaultBaseDir, string(filepath.Separator), util.DefaultSysConfig)
-	} else {
-		sysConfPath = filepath.Join(dir, string(filepath.Separator), util.DefaultSysConfig)
+	if homeDir == "" {
+		homeDir = util.DefaultBaseDir
 	}
-
+	sysConfPath = filepath.Join(homeDir, string(filepath.Separator), util.DefaultSysConfig)
 	c := &SysStaticConfig{}
 	if err = util.ReadJsonFile(sysConfPath, c); err != nil {
 		fmt.Println("parse system config failed:=>", err)
@@ -60,23 +57,21 @@ func PrepareConfig(dir string) error {
 	logrus.SetLevel(level)
 	logrus.SetFormatter(&logrus.JSONFormatter{})
 
-	confPath = filepath.Join(dir, string(filepath.Separator), util.DefaultConfDir)
-
-	err = sc.prepare(confPath, c.SmtpCfg)
+	err = sc.prepare(homeDir, c.SmtpCfg)
 	if err != nil {
 		return err
 	}
-	err = ic.prepare(confPath, c.ImapCfg)
-	if err != nil {
-		return err
-	}
-
-	err = bc.prepare(confPath, c.BSCfg)
+	err = ic.prepare(homeDir, c.ImapCfg)
 	if err != nil {
 		return err
 	}
 
-	err = backCfg.prepare(confPath, c.BackendCfg)
+	err = bc.prepare(homeDir, c.BSCfg)
+	if err != nil {
+		return err
+	}
+
+	err = backCfg.prepare(homeDir, c.BackendCfg)
 	if err != nil {
 		return err
 	}

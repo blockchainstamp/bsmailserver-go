@@ -29,10 +29,11 @@ func init() {
 
 func initSystemDefault(cmd *cobra.Command, args []string) {
 	dc := cfg.SysStaticConfig{
-		SmtpCfg:     "smtp.json",
-		ImapCfg:     "imap.json",
-		BSCfg:       "stamp.json",
-		WalletInUse: "main.json",
+		SmtpCfg:     "config/smtp.json",
+		ImapCfg:     "config/imap.json",
+		BSCfg:       "config/stamp.json",
+		BackendCfg:  "config/backend.json",
+		WalletInUse: "wallets/main.json",
 		DBPath:      "mail_data",
 		LogLevel:    "info",
 		CmdSrvAddr:  util.DefaultCmdSrvAddr,
@@ -52,7 +53,7 @@ func initSystemDefault(cmd *cobra.Command, args []string) {
 		panic(err)
 	}
 
-	subPath := path.Join(confPath, string(filepath.Separator), dc.SmtpCfg)
+	subPath := path.Join(baseDir, string(filepath.Separator), dc.SmtpCfg)
 	sConf := cfg.SMTPCfg{
 		SrvAddr:         "0.0.0.0",
 		SrvDomain:       "smtp.simplenets.org",
@@ -70,7 +71,7 @@ func initSystemDefault(cmd *cobra.Command, args []string) {
 		panic(err)
 	}
 
-	subPath = path.Join(confPath, string(filepath.Separator), dc.ImapCfg)
+	subPath = path.Join(baseDir, string(filepath.Separator), dc.ImapCfg)
 	iConf := cfg.IMAPCfg{
 		TlsKey:  "/etc/letsencrypt/live/smtp.simplenets.org/privkey.pem",
 		TlsCert: "/etc/letsencrypt/live/smtp.simplenets.org/fullchain.pem",
@@ -81,7 +82,7 @@ func initSystemDefault(cmd *cobra.Command, args []string) {
 		panic(err)
 	}
 
-	subPath = path.Join(confPath, string(filepath.Separator), dc.BSCfg)
+	subPath = path.Join(baseDir, string(filepath.Separator), dc.BSCfg)
 	bsConf := cfg.BStampConf{
 		WalletPwd: "123",
 	}
@@ -89,12 +90,12 @@ func initSystemDefault(cmd *cobra.Command, args []string) {
 		panic(err)
 	}
 
-	subPath = path.Join(confPath, string(filepath.Separator), dc.BackendCfg)
+	subPath = path.Join(baseDir, string(filepath.Separator), dc.BackendCfg)
 	backendCfg := cfg.BackConfig{
 		UseMemDB: true,
 	}
 	if err := util.WriteJsonFile(subPath, backendCfg); err != nil {
-		panic(err)
+		panic(subPath)
 	}
 
 	subPath = path.Join(baseDir, string(filepath.Separator), dc.DBPath)
@@ -106,7 +107,6 @@ func initSystemDefault(cmd *cobra.Command, args []string) {
 	if err := util.TouchDir(wPath); err != nil {
 		panic(err)
 	}
-	subPath = path.Join(wPath, string(filepath.Separator), dc.WalletInUse)
 
 	subPath = path.Join(baseDir, string(filepath.Separator), util.DefaultSysConfig)
 	if err := util.WriteJsonFile(subPath, dc); err != nil {

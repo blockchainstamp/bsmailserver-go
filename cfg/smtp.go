@@ -24,9 +24,9 @@ type SMTPCfg struct {
 	DKIMKeyData     []byte      `json:"-"`
 }
 
-func (c *SMTPCfg) prepare(cfg, fPath string) error {
+func (c *SMTPCfg) prepare(homeDir, fPath string) error {
 	if !filepath.IsAbs(fPath) {
-		fPath = filepath.Join(cfg, string(filepath.Separator), fPath)
+		fPath = filepath.Join(homeDir, string(filepath.Separator), fPath)
 	}
 	if err := util.ReadJsonFile(fPath, c); err != nil {
 		fmt.Println("parse smtp config failed:=>", err)
@@ -41,10 +41,10 @@ func (c *SMTPCfg) prepare(cfg, fPath string) error {
 		dPath = ""
 	)
 	if !filepath.IsAbs(c.TlsCert) {
-		cPath = filepath.Join(cfg, string(filepath.Separator), c.TlsCert)
+		cPath = filepath.Join(homeDir, string(filepath.Separator), c.TlsCert)
 	}
 	if !filepath.IsAbs(c.TlsKey) {
-		kPath = filepath.Join(cfg, string(filepath.Separator), c.TlsKey)
+		kPath = filepath.Join(homeDir, string(filepath.Separator), c.TlsKey)
 	}
 	tlsCfg, err := util.LoadServerTlsCnf(cPath, kPath)
 	if err != nil {
@@ -54,7 +54,7 @@ func (c *SMTPCfg) prepare(cfg, fPath string) error {
 	c.TlsCfg = tlsCfg
 
 	if !filepath.IsAbs(c.DKIMKey) {
-		dPath = filepath.Join(cfg, string(filepath.Separator), c.DKIMKey)
+		dPath = filepath.Join(homeDir, string(filepath.Separator), c.DKIMKey)
 	}
 	bts, err := os.ReadFile(dPath)
 	if err != nil {

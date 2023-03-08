@@ -7,14 +7,31 @@ import (
 )
 
 const (
-	DBTypMem = iota
+	DBTypMem DBTyp = iota
 	DBTypJson
 	DBTypLevelDB
 	DBTypSqlite
 )
 
+type DBTyp int8
+
+func (dt DBTyp) String() string {
+	switch dt {
+	case DBTypMem:
+		return "memory database"
+	case DBTypJson:
+		return "json file database"
+	case DBTypLevelDB:
+		return "leveldb"
+	case DBTypSqlite:
+		return "sqlite"
+	default:
+		return "unknown"
+	}
+}
+
 type BackConfig struct {
-	DBType    int8   `json:"db_type"` //0:memory db; 1:json file db; 2:leveldb; 3:sqlite db
+	DBType    DBTyp  `json:"db_type"` //0:memory db; 1:json file db; 2:leveldb; 3:sqlite db
 	CurDBHome string `json:"-"`
 	DBParam   string `json:"db_param"`
 	DBHome    string `json:"db_home"`
@@ -34,4 +51,14 @@ func (bc *BackConfig) prepare(homeDir, dbCfgFilePath string) error {
 		bc.CurDBHome = bc.DBParam
 	}
 	return nil
+}
+
+func (bc *BackConfig) String() string {
+	s := "\n======Backend Storage Config======"
+	s += "\nDBType:\t" + bc.DBType.String()
+	s += "\nDBParam:\t" + bc.DBParam
+	s += "\nDBHome:\t" + bc.DBHome
+	s += "\n==================================="
+	return s
+
 }

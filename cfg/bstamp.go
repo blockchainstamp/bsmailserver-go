@@ -20,3 +20,10 @@ func (c *BStampConf) prepare(cfg, fPath string) error {
 	}
 	return nil
 }
+
+func (c *BStampConf) String() string {
+	s := "\n======Blockchain Stamp Config======"
+	s += "\nWalletPwd:\t***"
+	s += "\n==================================="
+	return s
+}

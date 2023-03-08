@@ -21,12 +21,36 @@ type SysStaticConfig struct {
 	CmdSrvAddr  string `json:"cmd_srv_addr"`
 }
 
+func (c *SysStaticConfig) String() string {
+	s := "\n======System Static Config======"
+	s += "\nSmtpCfg:\t" + c.SmtpCfg
+	s += "\nImapCfg:\t" + c.ImapCfg
+	s += "\nBSCfg:  \t" + c.BSCfg
+	s += "\nBackendCfg:\t" + c.BackendCfg
+	s += "\nWalletInUse:\t" + c.WalletInUse
+	s += "\nLogLevel:\t" + c.LogLevel
+	s += "\nCmdSrvAddr:\t" + c.CmdSrvAddr
+	s += "\n================================"
+	return s
+}
+
 type SysRunTimeConfig struct {
 	useStamp bool
 	smtp     *SMTPCfg
 	imap     *IMAPCfg
 	bStamp   *BStampConf
 	backend  *BackConfig
+}
+
+func (c *SysRunTimeConfig) String() string {
+	s := "\n======System Run Time Config======"
+	s += fmt.Sprintf("\nuseStamp:\t%t", c.useStamp)
+	s += c.smtp.String()
+	s += c.imap.String()
+	s += c.bStamp.String()
+	s += c.backend.String()
+	s += "\n=================================="
+	return s
 }
 
 func PrepareConfig(homeDir string) error {
@@ -48,6 +72,7 @@ func PrepareConfig(homeDir string) error {
 		fmt.Println("parse system config failed:=>", err)
 		return err
 	}
+	fmt.Println(c.String())
 	level, err := logrus.ParseLevel(c.LogLevel)
 	if err != nil {
 		fmt.Println("set system log level failed:=>", err)
@@ -81,6 +106,7 @@ func PrepareConfig(homeDir string) error {
 		bStamp:  bc,
 		backend: backCfg,
 	}
+	fmt.Println(_curSysConf.String())
 	return nil
 }
 func UseStamp() bool {

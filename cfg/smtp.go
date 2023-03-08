@@ -24,6 +24,23 @@ type SMTPCfg struct {
 	DKIMKeyData     []byte      `json:"-"`
 }
 
+func (c *SMTPCfg) String() string {
+	s := "\n======SMTP Config======"
+	s += "\nSrvAddr:  \t" + c.SrvAddr
+	s += "\nSrvDomain:\t" + c.SrvDomain
+	s += "\nTlsKey:   \t" + c.TlsKey
+	s += "\nTlsCert:\t" + c.TlsCert
+	s += "\nDKIMKey:\t" + c.DKIMKey
+	s += fmt.Sprintf("\nSrvPort:\t%d", c.SrvPort)
+	s += fmt.Sprintf("\nAllowNotSecure:\t%t", c.AllowNotSecure)
+	s += fmt.Sprintf("\nMaxMessageBytes:\t%d", c.MaxMessageBytes)
+	s += fmt.Sprintf("\nReadTimeOut:\t%d", c.ReadTimeOut)
+	s += fmt.Sprintf("\nWriteTimeOut:\t%d", c.WriteTimeOut)
+	s += fmt.Sprintf("\nMaxRecipients:\t%d", c.MaxRecipients)
+	s += "\n========================="
+	return s
+}
+
 func (c *SMTPCfg) prepare(homeDir, fPath string) error {
 	if !filepath.IsAbs(fPath) {
 		fPath = filepath.Join(homeDir, string(filepath.Separator), fPath)

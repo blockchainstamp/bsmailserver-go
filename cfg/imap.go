@@ -16,6 +16,17 @@ type IMAPCfg struct {
 	TlsCfg         *tls.Config `json:"-"`
 }
 
+func (c *IMAPCfg) String() string {
+	s := "\n======IMAP Config======"
+	s += "\nTlsKey:  \t" + c.TlsKey
+	s += "\nTlsCert:\t" + c.TlsCert
+	s += "\nSrvAddr:\t" + c.SrvAddr
+	s += fmt.Sprintf("\nSrvPort:\t%d", c.SrvPort)
+	s += fmt.Sprintf("\nAllowNotSecure:\t%t", c.AllowNotSecure)
+	s += "\n======================="
+	return s
+}
+
 func (c *IMAPCfg) prepare(cfg, fPath string) error {
 	if !filepath.IsAbs(fPath) {
 		fPath = filepath.Join(cfg, string(filepath.Separator), fPath)

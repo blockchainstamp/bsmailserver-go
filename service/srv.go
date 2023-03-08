@@ -8,14 +8,8 @@ import (
 )
 
 var (
-	_inst    Service = nil
-	_once    sync.Once
-	_smtpLog = logrus.WithFields(logrus.Fields{
-		"mode": "smtp service",
-	})
-	_imapLog = logrus.WithFields(logrus.Fields{
-		"mode": "imap service",
-	})
+	_inst   Service = nil
+	_once   sync.Once
 	_srvLog = logrus.WithFields(logrus.Fields{
 		"mode": "mail service",
 	})

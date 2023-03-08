@@ -28,7 +28,7 @@ func newSmtpSrv() *SmtpSrv {
 	smtpSrv.TLSConfig = conf.TlsCfg
 
 	ss.service = smtpSrv
-	_smtpLog.Info("smtp service init success at:", smtpSrv.Addr)
+	_srvLog.Info("smtp service init success at:", smtpSrv.Addr)
 
 	return ss
 }
@@ -43,12 +43,12 @@ func (ss *SmtpSrv) Run() {
 		if conf.AllowNotSecure {
 			err := ss.service.ListenAndServe()
 			if err != nil {
-				panic(err)
+				_srvLog.Error("imap service exit:", err)
 			}
 		} else {
 			err := ss.service.ListenAndServeTLS()
 			if err != nil {
-				panic(err)
+				_srvLog.Error("imap service exit:", err)
 			}
 		}
 	}()

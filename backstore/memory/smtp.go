@@ -83,7 +83,7 @@ func (m *MemDB) finalizeSession(s *SmtpSession) {
 			_memBackLog.Warn("mail box err:", err)
 			continue
 		}
-		err = mbox.CreateMessage([]string{"\\Seen"}, time.Now(), s.data)
+		err = mbox.CreateMessage([]string{}, time.Now(), s.data)
 		if err != nil {
 			_memBackLog.Warn("create msg err:", err)
 			continue

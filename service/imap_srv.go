@@ -34,11 +34,13 @@ func (is *ImapSrv) Run() {
 			err := is.imapSrv.ListenAndServe()
 			if err != nil {
 				_srvLog.Error("imap service exit:", err)
+				panic(err)
 			}
 		} else {
 			err := is.imapSrv.ListenAndServeTLS()
 			if err != nil {
 				_srvLog.Error("imap service exit:", err)
+				panic(err)
 			}
 		}
 	}()

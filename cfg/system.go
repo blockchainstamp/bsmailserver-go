@@ -71,7 +71,7 @@ func PrepareConfig(homeDir string) error {
 	sysConfPath = filepath.Join(homeDir, string(filepath.Separator), util.DefaultSysConfig)
 	c := &SysStaticConfig{}
 	if err = util.ReadJsonFile(sysConfPath, c); err != nil {
-		fmt.Println("parse system config failed:=>", err)
+		fmt.Println("read config failed:=>", err)
 		return err
 	}
 	fmt.Println(c.String())

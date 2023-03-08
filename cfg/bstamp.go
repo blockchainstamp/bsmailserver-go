@@ -18,6 +18,7 @@ func (c *BStampConf) prepare(cfg, fPath string) error {
 		fmt.Println("parse blockchain stamp config failed:=>", err)
 		return err
 	}
+	fmt.Println(c.String())
 	return nil
 }
 

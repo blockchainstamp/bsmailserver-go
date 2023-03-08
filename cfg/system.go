@@ -12,6 +12,7 @@ var (
 )
 
 type SysStaticConfig struct {
+	UseStamp    bool   `json:"use_stamp"`
 	SmtpCfg     string `json:"smtp_cfg"`
 	ImapCfg     string `json:"imap_cfg"`
 	BSCfg       string `json:"bs_cfg"`
@@ -23,6 +24,7 @@ type SysStaticConfig struct {
 
 func (c *SysStaticConfig) String() string {
 	s := "\n======System Static Config======"
+	s += fmt.Sprintf("\nuseStamp:\t%t", c.UseStamp)
 	s += "\nSmtpCfg:\t" + c.SmtpCfg
 	s += "\nImapCfg:\t" + c.ImapCfg
 	s += "\nBSCfg:  \t" + c.BSCfg
@@ -107,7 +109,6 @@ func PrepareConfig(homeDir string) error {
 		bStamp:  bc,
 		backend: backCfg,
 	}
-	fmt.Println(_curSysConf.String())
 	return nil
 }
 func UseStamp() bool {

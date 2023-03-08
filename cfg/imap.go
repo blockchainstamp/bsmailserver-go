@@ -35,12 +35,13 @@ func (c *IMAPCfg) prepare(cfg, fPath string) error {
 		fmt.Println("parse imap config failed:=>", err)
 		return err
 	}
+	fmt.Println(c.String())
 	if c.AllowNotSecure {
 		return nil
 	}
 	var (
-		cPath = ""
-		kPath = ""
+		cPath = c.TlsCert
+		kPath = c.TlsKey
 	)
 	if !filepath.IsAbs(c.TlsCert) {
 		cPath = filepath.Join(cfg, string(filepath.Separator), c.TlsCert)

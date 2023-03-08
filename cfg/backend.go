@@ -50,14 +50,16 @@ func (bc *BackConfig) prepare(homeDir, dbCfgFilePath string) error {
 	} else {
 		bc.CurDBHome = bc.DBParam
 	}
+	fmt.Println(bc.String())
 	return nil
 }
 
 func (bc *BackConfig) String() string {
 	s := "\n======Backend Storage Config======"
-	s += "\nDBType:\t" + bc.DBType.String()
-	s += "\nDBParam:\t" + bc.DBParam
-	s += "\nDBHome:\t" + bc.DBHome
+	s += "\nDBType:   \t" + bc.DBType.String()
+	s += "\nCurDBHome:\t" + bc.CurDBHome
+	s += "\nDBParam:  \t" + bc.DBParam
+	s += "\nDBHome:   \t" + bc.DBHome
 	s += "\n==================================="
 	return s
 

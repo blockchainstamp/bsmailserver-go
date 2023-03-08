@@ -54,9 +54,9 @@ func (c *SMTPCfg) prepare(homeDir, fPath string) error {
 		return nil
 	}
 	var (
-		cPath = ""
-		kPath = ""
-		dPath = ""
+		cPath = c.TlsCert
+		kPath = c.TlsKey
+		dPath = c.DKIMKey
 	)
 	if !filepath.IsAbs(c.TlsCert) {
 		cPath = filepath.Join(homeDir, string(filepath.Separator), c.TlsCert)

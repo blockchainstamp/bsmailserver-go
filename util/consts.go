@@ -20,6 +20,12 @@ const (
 	DBJsonHome   = "jsonDB"
 	DBLevelHome  = "levelDB"
 	DBSqliteHome = "sqliteDB"
+
+	MHKeyDkimSign  = "Dkim-Signature"
+	MHKeyStampSign = "X-Stamp"
+	MHKeyMsgID     = "Message-Id"
+	MHKeyFrom      = "From"
+	MHKeyTos       = "To"
 )
 
 var (

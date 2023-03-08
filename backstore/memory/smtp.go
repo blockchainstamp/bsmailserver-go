@@ -3,6 +3,7 @@ package memory
 import (
 	"bytes"
 	"github.com/blockchainstamp/bsmailserver-go/util"
+	"github.com/emersion/go-msgauth/dkim"
 	"github.com/emersion/go-smtp"
 	"io"
 	"sync/atomic"
@@ -45,7 +46,29 @@ func (ss *SmtpSession) Rcpt(to string) error {
 }
 
 func (ss *SmtpSession) Data(r io.Reader) error {
-	_, err := ss.data.ReadFrom(r)
+	if ss.from != "" {
+		_, err := ss.data.ReadFrom(r)
+		return err
+	}
+	var buf bytes.Buffer
+	tr := io.TeeReader(r, &buf)
+	_, err := ss.data.ReadFrom(tr)
+	if err != nil {
+		return err
+	}
+	vers, err := dkim.Verify(&buf)
+	if err != nil {
+		return err
+	}
+	for _, ver := range vers {
+		if ver.Err != nil {
+			_memBackLog.Warn("dkim sig err:", ver.Domain, ver.Err)
+			return err
+		} else {
+			_memBackLog.Info("dkim sig success:", ver.Domain)
+		}
+	}
+
 	return err
 }
 
@@ -75,7 +98,7 @@ func (m *MemDB) finalizeSession(s *SmtpSession) {
 	for _, to := range s.tos {
 		uname, ok := m.imapUsers[to]
 		if !ok {
-			_memBackLog.Warn("unSupport user now:", to)
+			_memBackLog.Warn("outer user now:")
 			continue
 		}
 		mbox, err := uname.GetMailbox("INBOX")

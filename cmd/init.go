@@ -59,7 +59,7 @@ func initSystemDefault(cmd *cobra.Command, args []string) {
 		SrvDomain:       "localhost", //smtp.simplenets.org
 		TlsKey:          "config/key.pem",
 		TlsCert:         "config/cert.pem",
-		DKIMKey:         "config/dkim.key",
+		DKIMKey:         "config/dkim.pem",
 		SrvPort:         util.DefaultSMTPPort,
 		MaxMessageBytes: util.MaxMailSize,
 		ReadTimeOut:     util.SMTPReadTimeOut,

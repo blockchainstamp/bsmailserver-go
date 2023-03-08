@@ -49,6 +49,7 @@ func (c *SMTPCfg) prepare(homeDir, fPath string) error {
 		fmt.Println("parse smtp config failed:=>", err)
 		return err
 	}
+	fmt.Println(c.String())
 	if c.AllowNotSecure {
 		return nil
 	}
@@ -65,7 +66,7 @@ func (c *SMTPCfg) prepare(homeDir, fPath string) error {
 	}
 	tlsCfg, err := util.LoadServerTlsCnf(cPath, kPath)
 	if err != nil {
-		fmt.Println("load tls config of smtp server failed:", err)
+		fmt.Println("load tls config of smtp server failed:", cPath, kPath, err)
 		return err
 	}
 	c.TlsCfg = tlsCfg

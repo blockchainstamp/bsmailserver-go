@@ -80,6 +80,7 @@ func PrepareConfig(homeDir string) error {
 	}
 	logrus.SetLevel(level)
 	logrus.SetFormatter(&logrus.JSONFormatter{})
+	logrus.Info("set log level success:", level)
 
 	err = sc.prepare(homeDir, c.SmtpCfg)
 	if err != nil {

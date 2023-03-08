@@ -1,6 +1,7 @@
 package memory
 
 import (
+	"bytes"
 	"github.com/blockchainstamp/bsmailserver-go/util"
 	"github.com/emersion/go-smtp"
 	"io"
@@ -14,7 +15,7 @@ type SmtpSession struct {
 	tos      []string
 	auth     func(string, string) error
 	finalize func(session *SmtpSession)
-	reader   io.Reader
+	data     *bytes.Buffer
 }
 
 func (ss *SmtpSession) Reset() {
@@ -27,36 +28,34 @@ func (ss *SmtpSession) Logout() error {
 }
 
 func (ss *SmtpSession) AuthPlain(username, password string) error {
+	_memBackLog.Info("auth plain for:", username)
 	return ss.auth(username, password)
 }
 
 func (ss *SmtpSession) Mail(from string, opts *smtp.MailOptions) error {
+	_memBackLog.Debug("mail from:", from, opts)
 	ss.from = from
 	return nil
 }
 
 func (ss *SmtpSession) Rcpt(to string) error {
+	_memBackLog.Debug("to:", to)
 	ss.tos = append(ss.tos, to)
 	return nil
 }
 
 func (ss *SmtpSession) Data(r io.Reader) error {
-	ss.reader = r
-	return nil
+	_, err := ss.data.ReadFrom(r)
+	return err
 }
 
-func (ss *SmtpSession) Len() int {
-	return 0
-}
-func (ss *SmtpSession) Read(p []byte) (n int, err error) {
-	return ss.reader.Read(p)
-}
 func (m *MemDB) NewSession(c *smtp.Conn) (smtp.Session, error) {
 	atomic.AddUint32(&m.msgId, 1)
 	return &SmtpSession{
 		id:       m.msgId,
 		auth:     m.authSession,
 		finalize: m.finalizeSession,
+		data:     new(bytes.Buffer),
 	}, nil
 }
 
@@ -84,7 +83,7 @@ func (m *MemDB) finalizeSession(s *SmtpSession) {
 			_memBackLog.Warn("mail box err:", err)
 			continue
 		}
-		err = mbox.CreateMessage([]string{"\\Seen"}, time.Now(), s)
+		err = mbox.CreateMessage([]string{"\\Seen"}, time.Now(), s.data)
 		if err != nil {
 			_memBackLog.Warn("create msg err:", err)
 			continue

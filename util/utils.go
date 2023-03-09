@@ -80,9 +80,10 @@ func LoadDkimKey(path string) (crypto.Signer, error) {
 		return nil, err
 	}
 
-	block, _ := pem.Decode(b)
+	block, rest := pem.Decode(b)
 	if block == nil {
-		return nil, fmt.Errorf("no PEM data found")
+		fmt.Println(string(rest))
+		return nil, fmt.Errorf("no PEM data found :%s", path)
 	}
 
 	switch strings.ToUpper(block.Type) {

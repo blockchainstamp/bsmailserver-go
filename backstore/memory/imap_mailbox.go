@@ -22,7 +22,7 @@ func (mailbox *ImapMailBox) Name() string {
 }
 
 func (mailbox *ImapMailBox) Info() (*imap.MailboxInfo, error) {
-	_memBackLog.Debugf("[%s] Info ", mailbox.BName)
+	_memBackLog.Tracef("[%s] Info ", mailbox.BName)
 	return mailbox.BInfo, nil
 }
 
@@ -74,7 +74,7 @@ func (mailbox *ImapMailBox) unseenSeqNum() uint32 {
 }
 
 func (mailbox *ImapMailBox) Status(items []imap.StatusItem) (*imap.MailboxStatus, error) {
-	_memBackLog.Debugf("[%s] Status %v", mailbox.BName, items)
+	_memBackLog.Tracef("[%s] Status %v", mailbox.BName, items)
 
 	status := imap.NewMailboxStatus(mailbox.BName, items)
 	status.Flags = mailbox.flags()
@@ -100,18 +100,18 @@ func (mailbox *ImapMailBox) Status(items []imap.StatusItem) (*imap.MailboxStatus
 }
 
 func (mailbox *ImapMailBox) SetSubscribed(subscribed bool) error {
-	_memBackLog.Debugf("[%s] SetSubscribed ", mailbox.BName)
+	_memBackLog.Infof("[%s] SetSubscribed ", mailbox.BName)
 	mailbox.Subscribed = subscribed
 	return nil
 }
 
 func (mailbox *ImapMailBox) Check() error {
-	_memBackLog.Debugf("[%s]Mailbox Check", mailbox.BName)
+	_memBackLog.Tracef("[%s]Mailbox Check", mailbox.BName)
 	return nil
 }
 
 func (mailbox *ImapMailBox) ListMessages(uid bool, seqSet *imap.SeqSet, items []imap.FetchItem, ch chan<- *imap.Message) error {
-	_memBackLog.Debugf("[%s]Mailbox ListMessages", mailbox.BName)
+	_memBackLog.Tracef("[%s]Mailbox ListMessages", mailbox.BName)
 	defer close(ch)
 
 	for i, msg := range mailbox.Messages {
@@ -138,7 +138,7 @@ func (mailbox *ImapMailBox) ListMessages(uid bool, seqSet *imap.SeqSet, items []
 }
 
 func (mailbox *ImapMailBox) SearchMessages(uid bool, criteria *imap.SearchCriteria) ([]uint32, error) {
-	_memBackLog.Debugf("[%s]Mailbox SearchMessages", mailbox.BName)
+	_memBackLog.Tracef("[%s]Mailbox SearchMessages", mailbox.BName)
 	var ids []uint32
 	for i, msg := range mailbox.Messages {
 		seqNum := uint32(i + 1)
@@ -225,7 +225,7 @@ func (mailbox *ImapMailBox) CopyMessages(uid bool, seqset *imap.SeqSet, destName
 }
 
 func (mailbox *ImapMailBox) Expunge() error {
-	_memBackLog.Debugf("[%s]Mailbox Expunge", mailbox.BName)
+	_memBackLog.Infof("[%s]Mailbox Expunge", mailbox.BName)
 	for i := len(mailbox.Messages) - 1; i >= 0; i-- {
 		msg := mailbox.Messages[i]
 

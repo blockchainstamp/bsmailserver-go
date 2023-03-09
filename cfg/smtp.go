@@ -1,27 +1,28 @@
 package cfg
 
 import (
+	"crypto"
 	"crypto/tls"
 	"fmt"
 	"github.com/blockchainstamp/bsmailserver-go/util"
-	"os"
 	"path/filepath"
 )
 
 type SMTPCfg struct {
-	SrvAddr         string      `json:"srv_addr"`
-	SrvDomain       string      `json:"srv_domain"`
-	TlsKey          string      `json:"tls_key"`
-	TlsCert         string      `json:"tls_cert"`
-	DKIMKey         string      `json:"dkim_key"`
-	SrvPort         int         `json:"srv_port"`
-	AllowNotSecure  bool        `json:"allow_not_secure"`
-	MaxMessageBytes int         `json:"max_message_bytes"`
-	ReadTimeOut     int         `json:"read_time_out"`
-	WriteTimeOut    int         `json:"write_time_out"`
-	MaxRecipients   int         `json:"max_recipients"`
-	TlsCfg          *tls.Config `json:"-"`
-	DKIMKeyData     []byte      `json:"-"`
+	SrvAddr         string        `json:"srv_addr"`
+	SrvDomain       string        `json:"srv_domain"`
+	TlsKey          string        `json:"tls_key"`
+	TlsCert         string        `json:"tls_cert"`
+	DKIMKey         string        `json:"dkim_key"`
+	DKIMSelector    string        `json:"dkim_selector"`
+	SrvPort         int           `json:"srv_port"`
+	AllowNotSecure  bool          `json:"allow_not_secure"`
+	MaxMessageBytes int           `json:"max_message_bytes"`
+	ReadTimeOut     int           `json:"read_time_out"`
+	WriteTimeOut    int           `json:"write_time_out"`
+	MaxRecipients   int           `json:"max_recipients"`
+	TlsCfg          *tls.Config   `json:"-"`
+	DKIMSigner      crypto.Signer `json:"-"`
 }
 
 func (c *SMTPCfg) String() string {
@@ -50,35 +51,39 @@ func (c *SMTPCfg) prepare(homeDir, fPath string) error {
 		return err
 	}
 	fmt.Println(c.String())
-	if c.AllowNotSecure {
-		return nil
-	}
+
 	var (
 		cPath = c.TlsCert
 		kPath = c.TlsKey
 		dPath = c.DKIMKey
 	)
-	if !filepath.IsAbs(c.TlsCert) {
-		cPath = filepath.Join(homeDir, string(filepath.Separator), c.TlsCert)
+	if !c.AllowNotSecure && (c.TlsCert == "" || c.TlsKey == "") {
+		return util.CfgNoTlsFile
 	}
-	if !filepath.IsAbs(c.TlsKey) {
-		kPath = filepath.Join(homeDir, string(filepath.Separator), c.TlsKey)
+
+	if c.TlsCert != "" && c.TlsKey != "" {
+		if !filepath.IsAbs(c.TlsCert) {
+			cPath = filepath.Join(homeDir, string(filepath.Separator), c.TlsCert)
+		}
+		if !filepath.IsAbs(c.TlsKey) {
+			kPath = filepath.Join(homeDir, string(filepath.Separator), c.TlsKey)
+		}
+		tlsCfg, err := util.LoadServerTlsCnf(cPath, kPath)
+		if err != nil {
+			fmt.Println("load tls config of smtp server failed:", cPath, kPath, err)
+			return err
+		}
+		c.TlsCfg = tlsCfg
 	}
-	tlsCfg, err := util.LoadServerTlsCnf(cPath, kPath)
-	if err != nil {
-		fmt.Println("load tls config of smtp server failed:", cPath, kPath, err)
-		return err
-	}
-	c.TlsCfg = tlsCfg
 
 	if !filepath.IsAbs(c.DKIMKey) {
 		dPath = filepath.Join(homeDir, string(filepath.Separator), c.DKIMKey)
 	}
-	bts, err := os.ReadFile(dPath)
+
+	signer, err := util.LoadDkimKey(dPath)
 	if err != nil {
-		fmt.Println("load DKIM key for smtp server failed:", err)
 		return err
 	}
-	c.DKIMKeyData = bts
-	return err
+	c.DKIMSigner = signer
+	return nil
 }

@@ -17,7 +17,7 @@ func (user *ImapUser) Username() string {
 }
 
 func (user *ImapUser) ListMailboxes(subscribed bool) ([]backend.Mailbox, error) {
-	_memBackLog.Debugf("[%s] ListMailboxes[%t]", user.username, subscribed)
+	_memBackLog.Tracef("[%s] ListMailboxes[%t]", user.username, subscribed)
 	var boxes []backend.Mailbox
 	for _, box := range user.mailboxes {
 		boxes = append(boxes, box)
@@ -26,7 +26,7 @@ func (user *ImapUser) ListMailboxes(subscribed bool) ([]backend.Mailbox, error) 
 }
 
 func (user *ImapUser) GetMailbox(name string) (backend.Mailbox, error) {
-	_memBackLog.Debugf("[%s] GetMailbox[%s]", user.username, name)
+	_memBackLog.Tracef("[%s] GetMailbox[%s]", user.username, name)
 	mbox, ok := user.mailboxes[name]
 	if !ok {
 		return nil, util.BackendNoSuchMailBox
@@ -36,7 +36,7 @@ func (user *ImapUser) GetMailbox(name string) (backend.Mailbox, error) {
 }
 
 func (user *ImapUser) CreateMailbox(name string) error {
-	_memBackLog.Debugf("[%s] CreateMailbox", user.username)
+	_memBackLog.Infof("[%s] CreateMailbox", user.username)
 	if _, ok := user.mailboxes[name]; ok {
 		return util.BackendDuplicateMailBox
 	}
@@ -48,7 +48,7 @@ func (user *ImapUser) CreateMailbox(name string) error {
 }
 
 func (user *ImapUser) DeleteMailbox(name string) error {
-	_memBackLog.Debugf("[%s] DeleteMailbox", user.username)
+	_memBackLog.Infof("[%s] DeleteMailbox", user.username)
 	if name == "INBOX" {
 		return util.BackendDeleteInbox
 	}
@@ -61,7 +61,7 @@ func (user *ImapUser) DeleteMailbox(name string) error {
 }
 
 func (user *ImapUser) RenameMailbox(existingName, newName string) error {
-	_memBackLog.Debugf("[%s] RenameMailbox", user.username)
+	_memBackLog.Infof("[%s] RenameMailbox", user.username)
 	mbox, ok := user.mailboxes[existingName]
 	if !ok {
 		return util.BackendNoSuchMailBox

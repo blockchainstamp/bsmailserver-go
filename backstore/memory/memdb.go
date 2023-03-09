@@ -76,7 +76,7 @@ type MemDB struct {
 	imapUsers   map[string]*ImapUser
 	Users       map[string]string
 	MailBoxes   MailBoxGroup
-	msgId       uint32
+	sessionID   uint32
 	smtpSession map[string]*SmtpSession
 }
 

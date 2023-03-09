@@ -65,6 +65,7 @@ func initSystemDefault(cmd *cobra.Command, args []string) {
 		ReadTimeOut:     util.SMTPReadTimeOut,
 		WriteTimeOut:    util.SMTPWriteTimeOut,
 		MaxRecipients:   util.SMTPMaxRecipients,
+		DKIMSelector:    "dkim",
 	}
 
 	if err := util.WriteJsonFile(smtpCfgFilePath, sConf); err != nil {

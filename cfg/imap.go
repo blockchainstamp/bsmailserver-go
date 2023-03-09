@@ -36,24 +36,28 @@ func (c *IMAPCfg) prepare(cfg, fPath string) error {
 		return err
 	}
 	fmt.Println(c.String())
-	if c.AllowNotSecure {
-		return nil
+
+	if !c.AllowNotSecure && (c.TlsCert == "" || c.TlsKey == "") {
+		return util.CfgNoTlsFile
 	}
 	var (
 		cPath = c.TlsCert
 		kPath = c.TlsKey
 	)
-	if !filepath.IsAbs(c.TlsCert) {
-		cPath = filepath.Join(cfg, string(filepath.Separator), c.TlsCert)
+
+	if c.TlsCert != "" || c.TlsKey != "" {
+		if !filepath.IsAbs(c.TlsCert) {
+			cPath = filepath.Join(cfg, string(filepath.Separator), c.TlsCert)
+		}
+		if !filepath.IsAbs(c.TlsKey) {
+			kPath = filepath.Join(cfg, string(filepath.Separator), c.TlsKey)
+		}
+		tlsCfg, err := util.LoadServerTlsCnf(cPath, kPath)
+		if err != nil {
+			fmt.Println("load tls config of imap server failed:", err)
+			return err
+		}
+		c.TlsCfg = tlsCfg
 	}
-	if !filepath.IsAbs(c.TlsKey) {
-		kPath = filepath.Join(cfg, string(filepath.Separator), c.TlsKey)
-	}
-	tlsCfg, err := util.LoadServerTlsCnf(cPath, kPath)
-	if err != nil {
-		fmt.Println("load tls config of imap server failed:", err)
-		return err
-	}
-	c.TlsCfg = tlsCfg
-	return err
+	return nil
 }

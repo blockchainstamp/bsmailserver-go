@@ -67,7 +67,7 @@ func (ss *SmtpSession) Rcpt(to string) error {
 }
 
 func (ss *SmtpSession) Data(r io.Reader) error {
-	_memBackLog.Debug("process mail data", ss.isLcl, ss.ev.From)
+	_memBackLog.Debugf("local[%t], process mail data for[%s]", ss.isLcl, ss.ev.From)
 	ss.ev.DataSource = r
 	//TODO:: get stamp here
 	if ss.isLcl {

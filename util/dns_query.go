@@ -29,13 +29,18 @@ func DnsInst() *DnsUtil {
 	return _inst
 }
 
-func (du *DnsUtil) ValidSmtpCli(lDomain, rDomain string, tlsCfg *tls.Config) (*smtp.Client, error) {
+func (du *DnsUtil) ValidSmtpCli(lDomain, rDomain string, tlsCfg *tls.Config) (c *smtp.Client, err error) {
+	var (
+		mxs []*net.MX
+		ok  bool
+	)
+
 	du.RLock()
-	mxs, ok := du.MXs[rDomain]
+	mxs, ok = du.MXs[rDomain]
 	du.RUnlock()
 	if !ok {
 		_dnsLog.Info("no cached mx record for domain:", rDomain)
-		mxs, err := net.LookupMX(rDomain)
+		mxs, err = net.LookupMX(rDomain)
 		if err != nil {
 			_dnsLog.Warn("LookupMX err:", err, rDomain)
 			return nil, err
@@ -48,10 +53,11 @@ func (du *DnsUtil) ValidSmtpCli(lDomain, rDomain string, tlsCfg *tls.Config) (*s
 		du.MXs[rDomain] = mxs
 		du.Unlock()
 	}
+
 	for _, mx := range mxs {
 		_dnsLog.Debugf("prepare to try mx:%+v", mx)
 		addr := fmt.Sprintf("%s:%d", mx.Host, DefaultSystemSmtpPort)
-		c, err := smtp.Dial(addr)
+		c, err = smtp.Dial(addr)
 		if err != nil {
 			_dnsLog.Warn("dial err:", err, mx.Host)
 			continue

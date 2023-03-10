@@ -7,6 +7,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"net"
 	"sync"
+	"time"
 )
 
 var (
@@ -27,6 +28,41 @@ func DnsInst() *DnsUtil {
 		_inst = &DnsUtil{MXs: make(map[string][]*net.MX)}
 	})
 	return _inst
+}
+
+func tryConnect(lDomain, rHost string, mx *net.MX) (c *smtp.Client, err error) {
+	_dnsLog.Debugf("prepare to try mx:%+v", mx)
+	addr := fmt.Sprintf("%s:%d", mx.Host, DefaultSystemSmtpPort)
+	tlsCfg := &tls.Config{ServerName: rHost}
+	conn, err := net.DialTimeout("tcp", addr, time.Second*30)
+	if err != nil {
+		_dnsLog.Warnf("dial(%s) err: %s", addr, err)
+		return
+	}
+	c, err = smtp.NewClient(conn, mx.Host)
+	if err != nil {
+		_dnsLog.Warnf("dial(%s) err: %s", addr, err)
+		goto closeAndRet
+	}
+	err = c.Hello(lDomain)
+	if err != nil {
+		_dnsLog.Warn("say hello err:", err, lDomain, mx.Host)
+		goto closeAndRet
+	}
+	if ok, _ := c.Extension("STARTTLS"); !ok {
+		_dnsLog.Warn("server doesn't support STARTTLS", mx.Host)
+		goto closeAndRet
+	}
+	err = c.StartTLS(tlsCfg)
+	if err != nil {
+		_dnsLog.Warn("start tls err:", err, mx.Host)
+		goto closeAndRet
+	}
+	return c, nil
+
+closeAndRet:
+	conn.Close()
+	return nil, err
 }
 
 func (du *DnsUtil) ValidSmtpCli(lDomain, rDomain string, tlsCfg *tls.Config) (c *smtp.Client, err error) {
@@ -55,27 +91,10 @@ func (du *DnsUtil) ValidSmtpCli(lDomain, rDomain string, tlsCfg *tls.Config) (c 
 	}
 
 	for _, mx := range mxs {
-		_dnsLog.Debugf("prepare to try mx:%+v", mx)
-		addr := fmt.Sprintf("%s:%d", mx.Host, DefaultSystemSmtpPort)
-		c, err = smtp.Dial(addr)
+		c, err = tryConnect(lDomain, rDomain, mx)
 		if err != nil {
-			_dnsLog.Warn("dial err:", err, mx.Host)
 			continue
 		}
-		err = c.Hello(lDomain)
-		if err != nil {
-			_dnsLog.Warn("say hello err:", err, lDomain, mx.Host)
-			continue
-		}
-		if ok, _ := c.Extension("STARTTLS"); !ok {
-			_dnsLog.Warn("server doesn't support STARTTLS", mx.Host)
-			continue
-		}
-		//err = c.StartTLS(tlsCfg)
-		//if err != nil {
-		//	_dnsLog.Warn("start tls err:", err, mx.Host)
-		//	continue
-		//}
 		return c, nil
 	}
 

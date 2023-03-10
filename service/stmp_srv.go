@@ -29,7 +29,6 @@ func newSmtpSrv() *SmtpSrv {
 	smtpSrv.MaxRecipients = conf.MaxRecipients
 	smtpSrv.AllowInsecureAuth = conf.AllowNotSecure
 	smtpSrv.TLSConfig = conf.TlsCfg
-
 	ss.service = smtpSrv
 	_srvLog.Info("smtp service init success at: ", smtpSrv.Addr)
 

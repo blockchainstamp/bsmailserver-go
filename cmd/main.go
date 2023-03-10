@@ -100,7 +100,7 @@ func logVersion() {
 func waitSignal() {
 	sigCh := make(chan os.Signal, 1)
 	pid := strconv.Itoa(os.Getpid())
-	fmt.Printf("\n>>>>>>>>>>proxy start at pid(%s)<<<<<<<<<<\n", pid)
+	fmt.Printf("\n>>>>>>>>>>bsmail start at pid(%s)<<<<<<<<<<\n", pid)
 
 	signal.Notify(sigCh,
 		syscall.SIGHUP,
@@ -114,7 +114,13 @@ func waitSignal() {
 
 	//TODO:: process system signal
 	for sig := range sigCh {
-		fmt.Printf("\n>>>>>>>>>>proxy[%s] finished(%s)<<<<<<<<<<\n", pid, sig)
-		return
+		fmt.Printf("\n>>>>>>>>>>bsmail[%s] finished(%s)<<<<<<<<<<\n", pid, sig)
+		switch sig {
+		case syscall.SIGHUP:
+			fmt.Println(">>>>>>>>>>hangup<<<<<<<<<<")
+			continue
+		default:
+			return
+		}
 	}
 }

@@ -2,7 +2,9 @@ package memory
 
 import (
 	"fmt"
+	"github.com/blockchainstamp/bsmailserver-go/util"
 	"github.com/emersion/go-msgauth/dmarc"
+	"github.com/emersion/go-smtp"
 	"net"
 	"strings"
 	"testing"
@@ -38,6 +40,35 @@ func TestTxtLookup(t *testing.T) {
 	txt = strings.Join(txts, "")
 	fmt.Println(txt)
 }
-func TestVerifySig(t *testing.T) {
 
+func TestMXInfo(t *testing.T) {
+	//tlsCfg, err := util.LoadServerTlsCnf("fullchain.pem", "privkey.pem")
+	//if err != nil {
+	//	t.Fatal(err)
+	//}
+	mxs, err := net.LookupMX("126.com")
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, mx := range mxs {
+		fmt.Printf("\n%+v\n", mx)
+		addr := fmt.Sprintf("%s:%d", mx.Host, util.DefaultSystemSmtpPort)
+		c, err := smtp.Dial(addr)
+		if err != nil {
+			t.Fatal(err)
+		}
+		err = c.Hello("simplenets.org")
+		if err != nil {
+			t.Fatal(err)
+
+		}
+		if ok, _ := c.Extension("STARTTLS"); !ok {
+			t.Fatal(err)
+		}
+
+		//err = c.StartTLS(nil)
+		//if err != nil {
+		//	t.Fatal(err)
+		//}
+	}
 }

@@ -34,12 +34,13 @@ func (du *DnsUtil) ValidSmtpCli(lDomain, rDomain string, tlsCfg *tls.Config) (*s
 	mxs, ok := du.MXs[rDomain]
 	du.RUnlock()
 	if !ok {
-		_dnsLog.Info("no cached mx record", rDomain)
+		_dnsLog.Info("no cached mx record for domain:", rDomain)
 		mxs, err := net.LookupMX(rDomain)
 		if err != nil {
 			_dnsLog.Warn("LookupMX err:", err, rDomain)
 			return nil, err
 		}
+		_dnsLog.Infof("mxs[%d] from dns for domain:%s", len(mxs), rDomain)
 		if len(mxs) == 0 {
 			mxs = []*net.MX{{Host: rDomain}}
 		}
@@ -47,8 +48,8 @@ func (du *DnsUtil) ValidSmtpCli(lDomain, rDomain string, tlsCfg *tls.Config) (*s
 		du.MXs[rDomain] = mxs
 		du.Unlock()
 	}
-
 	for _, mx := range mxs {
+		_dnsLog.Debugf("prepare to try mx:%+v", mx)
 		addr := fmt.Sprintf("%s:%d", mx.Host, DefaultSystemSmtpPort)
 		c, err := smtp.Dial(addr)
 		if err != nil {
@@ -64,11 +65,11 @@ func (du *DnsUtil) ValidSmtpCli(lDomain, rDomain string, tlsCfg *tls.Config) (*s
 			_dnsLog.Warn("server doesn't support STARTTLS", mx.Host)
 			continue
 		}
-		err = c.StartTLS(tlsCfg)
-		if err != nil {
-			_dnsLog.Warn("start tls err:", err, mx.Host)
-			continue
-		}
+		//err = c.StartTLS(tlsCfg)
+		//if err != nil {
+		//	_dnsLog.Warn("start tls err:", err, mx.Host)
+		//	continue
+		//}
 		return c, nil
 	}
 

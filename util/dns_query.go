@@ -7,7 +7,6 @@ import (
 	"github.com/sirupsen/logrus"
 	"net"
 	"sync"
-	"time"
 )
 
 var (
@@ -34,7 +33,7 @@ func tryConnect(lDomain, rHost string, mx *net.MX) (c *smtp.Client, err error) {
 	_dnsLog.Debugf("prepare to try mx:%+v", mx)
 	addr := fmt.Sprintf("%s:%d", mx.Host, DefaultSystemSmtpPort)
 	tlsCfg := &tls.Config{ServerName: rHost}
-	conn, err := net.DialTimeout("tcp", addr, time.Second*30)
+	conn, err := net.DialTimeout("tcp", addr, MailMTATimeOut)
 	if err != nil {
 		_dnsLog.Warnf("dial(%s) err: %s", addr, err)
 		return
@@ -65,7 +64,7 @@ closeAndRet:
 	return nil, err
 }
 
-func (du *DnsUtil) ValidSmtpCli(lDomain, rDomain string, tlsCfg *tls.Config) (c *smtp.Client, err error) {
+func (du *DnsUtil) ValidSmtpCli(lDomain, rDomain string) (c *smtp.Client, err error) {
 	var (
 		mxs []*net.MX
 		ok  bool

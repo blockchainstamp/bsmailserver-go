@@ -1,6 +1,9 @@
 package util
 
-import "fmt"
+import (
+	"fmt"
+	"time"
+)
 
 const (
 	DefaultBaseDir        = "MailBase"
@@ -33,6 +36,8 @@ const (
 )
 
 var (
+	MailMTATimeOut = time.Second * 30
+
 	BackendNoSuchUser       = fmt.Errorf("no such user")
 	BackendBadUser          = fmt.Errorf("bad user name and password")
 	BackendNoSuchMailBox    = fmt.Errorf("no such mail box")

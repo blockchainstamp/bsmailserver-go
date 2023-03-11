@@ -118,3 +118,28 @@ func TestDnsQuery(t *testing.T) {
 		fmt.Println(c.TLSConnectionState())
 	}
 }
+
+func TestTryConn(t *testing.T) {
+	var addr = "localhost:1025"
+	conn, err := net.DialTimeout("tcp", addr, MailMTATimeOut)
+	if err != nil {
+		t.Fatal(err)
+		return
+	}
+	c, err := smtp.NewClient(conn, "localhost")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = c.Hello("lDomain")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if ok, _ := c.Extension("STARTTLS"); !ok {
+		t.Fatal("must support STARTTLS")
+	}
+	tlsCfg := &tls.Config{ServerName: "localhost"}
+	err = c.StartTLS(tlsCfg)
+	if err != nil {
+		t.Fatal(err)
+	}
+}

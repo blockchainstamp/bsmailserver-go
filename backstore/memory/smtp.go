@@ -210,7 +210,7 @@ func (m *MemDB) sendToRemoteSrv(tos map[string][]string, env *SmtpEnvelop) error
 
 	for domain, subTos := range tos {
 		_memBackLog.Debug("prepare to send out mail: ", domain, subTos)
-		cli, err := util.DnsInst().ValidSmtpCli(conf.SrvDomain, domain, conf.TlsCfg)
+		cli, err := util.DnsInst().ValidSmtpCli(conf.SrvDomain, domain)
 		if err != nil {
 			_memBackLog.Warn("no valid mail cli: ", err)
 			return err

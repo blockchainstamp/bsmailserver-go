@@ -24,4 +24,5 @@ require (
 	golang.org/x/text v0.6.0 // indirect
 	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
 )
-replace github.com/emersion/go-smtp => /Users/wesley/bmail/go-smtp
+
+replace github.com/emersion/go-smtp => github.com/blockchainstamp/go-smtp v0.0.0-20230108191019-90d596c5fb00

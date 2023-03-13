@@ -32,7 +32,6 @@ func DnsInst() *DnsUtil {
 func tryConnect(lDomain, rHost string, mx *net.MX) (c *smtp.Client, err error) {
 	_dnsLog.Debugf("prepare to try mx:%+v", mx)
 	addr := fmt.Sprintf("%s:%d", mx.Host, DefaultSystemSmtpPort)
-	tlsCfg := &tls.Config{ServerName: rHost}
 	conn, err := net.DialTimeout("tcp", addr, MailMTATimeOut)
 	if err != nil {
 		_dnsLog.Warnf("dial(%s) err: %s", addr, err)
@@ -48,15 +47,15 @@ func tryConnect(lDomain, rHost string, mx *net.MX) (c *smtp.Client, err error) {
 		_dnsLog.Warn("say hello err:", err, lDomain, mx.Host)
 		goto closeAndRet
 	}
-	if ok, _ := c.Extension("STARTTLS"); !ok {
-		_dnsLog.Warn("server doesn't support STARTTLS", mx.Host)
-		goto closeAndRet
+
+	if ok, _ := c.Extension("STARTTLS"); ok {
+		tlsCfg := &tls.Config{ServerName: rHost}
+		err = c.StartTLS(tlsCfg)
+		if err != nil {
+			return nil, err
+		}
 	}
-	err = c.StartTLS(tlsCfg)
-	if err != nil {
-		_dnsLog.Warn("start tls err:", err, mx.Host)
-		goto closeAndRet
-	}
+
 	return c, nil
 
 closeAndRet:

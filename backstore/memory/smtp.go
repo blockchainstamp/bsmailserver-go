@@ -46,7 +46,7 @@ func (ss *SmtpSession) AuthPlain(username, password string) error {
 }
 
 func (ss *SmtpSession) Mail(from string, opts *smtp.MailOptions) error {
-	_memBackLog.Debug("mail from:", from, opts)
+	_memBackLog.Debugf("mail from[%s] options[%#v]", from, opts)
 	ss.ev.From = from
 	return nil
 }
@@ -157,13 +157,16 @@ func (m *MemDB) serveForSrv(env *SmtpEnvelop) error {
 func (m *MemDB) msgToInbox(user *ImapUser, env *SmtpEnvelop) error {
 	inbox, err := user.GetMailbox(util.MBXIndex)
 	if err != nil {
+		_memBackLog.Warnf("create msg for[%s] failed:%s", user.username, err)
 		return err
 	}
 	var buf bytes.Buffer
 	_, err = buf.ReadFrom(env.DataSource)
 	if err != nil {
+		_memBackLog.Warnf("read msg data failed for[%s] failed:%s", user.username, err)
 		return err
 	}
+	_memBackLog.Debugf("create new message for[%s]", user.username)
 	return inbox.CreateMessage([]string{}, time.Now(), &buf)
 }
 

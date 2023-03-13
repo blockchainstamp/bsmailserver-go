@@ -119,27 +119,60 @@ func TestDnsQuery(t *testing.T) {
 	}
 }
 
+var (
+	now = time.Now().Format("2006-01-02 15:04:05")
+
+	tEmail  = "midoks@163.com"
+	fEmail  = "admin@cachecha.com"
+	content = fmt.Sprintf("From: <%s>\r\nSubject: Hello imail[%s]\r\nTo: <%s>\r\n\r\nHi! yes is test. imail ok?", fEmail, now, tEmail)
+)
+
 func TestTryConn(t *testing.T) {
-	var addr = "localhost:1025"
-	conn, err := net.DialTimeout("tcp", addr, MailMTATimeOut)
-	if err != nil {
-		t.Fatal(err)
-		return
-	}
-	c, err := smtp.NewClient(conn, "localhost")
+	var addr = host + ":25"
+	conn, err := net.DialTimeout("tcp4", addr, MailMTATimeOut)
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = c.Hello("lDomain")
+	c, err := smtp.NewClient(conn, host)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if ok, _ := c.Extension("STARTTLS"); !ok {
-		t.Fatal("must support STARTTLS")
-	}
-	tlsCfg := &tls.Config{ServerName: "localhost"}
-	err = c.StartTLS(tlsCfg)
+	err = c.Hello("localhost")
 	if err != nil {
 		t.Fatal(err)
 	}
+	if ok, _ := c.Extension("STARTTLS"); ok {
+		tlsCfg := &tls.Config{ServerName: host}
+		err = c.StartTLS(tlsCfg)
+		if err != nil {
+			t.Fatal(err)
+		}
+	}
+	if ok, _ := c.Extension("AUTH"); !ok {
+		t.Fatal("smtp: server doesn't support AUTH")
+	}
+
+	//if err = c.Mail(from); err != nil {
+	//	return err
+	//}
+	//for _, addr := range to {
+	//	if err = c.Rcpt(addr); err != nil {
+	//		return err
+	//	}
+	//}
+	//w, err := c.Data()
+	//
+	//if err != nil {
+	//	return err
+	//}
+	//_, err = w.Write(msg)
+	//
+	//if err != nil {
+	//	return err
+	//}
+	//err = w.Close()
+	//if err != nil {
+	//	return err
+	//}
+	//return c.Quit()
 }
